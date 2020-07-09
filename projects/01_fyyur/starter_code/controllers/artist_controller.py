@@ -6,7 +6,6 @@ from flask import Flask, render_template, request, Response, flash, redirect, ur
 from flask_wtf import Form
 from forms import *
 from db_data_models import *
-from sqlalchemy import exc
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -47,43 +46,33 @@ def show_artist(artist_id):
     past_shows = selected_artist.artist_show.filter(
         Show.start_time < datetime.now()).all()
 
-    data = {
-        "id": selected_artist.id,
-        "name": selected_artist.name,
-        "genres": selected_artist.genres,
-        "city": selected_artist.city,
-        "state": selected_artist.state,
-        "phone": selected_artist.phone,
-        "website": selected_artist.website,
-        "facebook_link": selected_artist.facebook_link,
-        "seeking_venue": selected_artist.seeking_venue,
-        "seeking_description": selected_artist.seeking_description,
-        "image_link": selected_artist.image_link,
-        "past_shows": past_shows,
-        "upcoming_shows": upcoming_shows,
-        "past_shows_count": len(past_shows),
-        "upcoming_shows_count": len(upcoming_shows),
-    }
+    data = selected_artist.map_artist_to_dict()
+
+    data["past_shows"] = past_shows
+    data["upcoming_shows"] = upcoming_shows
+    data["past_shows_count"] = len(past_shows)
+    data["upcoming_shows_count"] = len(upcoming_shows)
+
     return render_template('pages/show_artist.html', artist=data)
 
 #  Create
 #  ----------------------------------------------------------------
 
 
-@app.route('/artists/create', methods=['GET'])
+@ app.route('/artists/create', methods=['GET'])
 def create_artist_form():
     form = ArtistForm()
     return render_template('forms/new_artist.html', form=form)
 
 
-@app.route('/artists/create', methods=['POST'])
+@ app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
     form = ArtistForm()
     try:
         seeking_venue = False
         seeking_description = ''
         if 'seeking_venue' in request.form:
-            seeking_venue = form.seeking_venue.data == 'y'
+            seeking_venue = form.seeking_venue.data
         if 'seeking_description' in request.form:
             seeking_description = form.seeking_description.data
 
@@ -131,19 +120,7 @@ def edit_artist(artist_id):
     form.seeking_venue.data = artist.seeking_venue
     form.seeking_description.data = artist.seeking_description
 
-    artist = {
-        "id": artist.id,
-        "name": artist.name,
-        "genres": artist.genres,
-        "city": artist.city,
-        "state": artist.state,
-        "phone": artist.phone,
-        "website": artist.website,
-        "facebook_link": artist.facebook_link,
-        "seeking_venue": artist.seeking_venue,
-        "seeking_description": artist.seeking_description,
-        "image_link": artist.image_link,
-    }
+    artist = artist.map_artist_to_dict()
     return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 
@@ -155,9 +132,9 @@ def edit_artist_submission(artist_id):
 
         seeking_venue = False
         seeking_description = ''
-        if 'seeking_venue' in request.form:
-            seeking_venue = form.seeking_venue.data == 'y'
-        if 'seeking_description' in request.form:
+        if 'seeking_venue' in form:
+            seeking_venue = form.seeking_venue.data
+        if 'seeking_description' in form:
             seeking_description = form.seeking_description.data
 
         artist.name = form.name.data
@@ -174,10 +151,10 @@ def edit_artist_submission(artist_id):
         db.session.commit()
         flash('Artist ' + artist.name + ' was successfully edited!')
 
-    except exc.SQLAlchemyError as e:
+    except:
         db.session.rollback()
         flash('An error occurred. Artist ' +
-              artist.name + ' could not be edited.' + str(e))
+              artist.name + ' could not be edited.')
     finally:
         db.session.close()
     return redirect(url_for('show_artist', artist_id=artist_id))

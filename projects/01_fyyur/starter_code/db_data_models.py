@@ -14,8 +14,8 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
-
 migrate = Migrate(app, db)
+
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
@@ -33,10 +33,26 @@ class Venue(db.Model):
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     genres = db.Column(db.ARRAY(db.String), nullable=False)
-    seeking_description = db.Column(db.String(120))
+    seeking_description = db.Column(db.String(200))
     seeking_talent = db.Column(db.Boolean, default=False)
-    website = db.Column(db.String())
+    website = db.Column(db.String(200))
     venues_show = db.relationship('Show', backref='Venue', lazy='dynamic')
+
+    def map_venue_to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "genres": self.genres,
+            "address": self.address,
+            "city": self.city,
+            "state": self.state,
+            "phone": self.phone,
+            "website": self.website,
+            "facebook_link": self.facebook_link,
+            "seeking_talent": self.seeking_talent,
+            "seeking_description": self.seeking_description,
+            "image_link": self.image_link
+        }
 
 
 class Artist(db.Model):
@@ -52,8 +68,23 @@ class Artist(db.Model):
     genres = db.Column(db.ARRAY(db.String), nullable=False)
     seeking_venue = db.Column(db.Boolean, default=False)
     seeking_description = db.Column(db.String(200))
-    website = db.Column(db.String())
+    website = db.Column(db.String(200))
     artist_show = db.relationship("Show", backref="Artist", lazy='dynamic')
+
+    def map_artist_to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "genres": self.genres,
+            "city": self.city,
+            "state": self.state,
+            "phone": self.phone,
+            "website": self.website,
+            "facebook_link": self.facebook_link,
+            "seeking_venue": self.seeking_venue,
+            "seeking_description": self.seeking_description,
+            "image_link": self.image_link
+        }
 
 
 class Show(db.Model):

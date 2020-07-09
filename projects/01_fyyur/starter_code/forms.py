@@ -110,17 +110,17 @@ class VenueForm(Form):
         'address', validators=[DataRequired(), Length(max=120)]
     )
     phone = StringField(
-        'phone', validators=[DataRequired()]
+        'phone', validators=[DataRequired(), Length(max=120)]
     )
     image_link = StringField(
-        'image_link', validators=[DataRequired(), URL(), Length(max=200)]
+        'image_link', validators=[DataRequired(), URL(), Length(max=500)]
     )
     genres = SelectMultipleField(
         'genres', validators=[DataRequired()], choices=genres_choices
 
     )
     facebook_link = StringField(
-        'facebook_link', validators=[DataRequired(), URL()]
+        'facebook_link', validators=[DataRequired(), URL(), Length(max=120)]
     )
 
     seeking_talent = BooleanField(
@@ -128,10 +128,10 @@ class VenueForm(Form):
     )
 
     seeking_description = StringField(
-        'seeking_description', validators=[Length(max=500)]
+        'seeking_description', validators=[Length(max=200)]
     )
     website = StringField(
-        'website', validators=[DataRequired(), URL(), Length(max=120)]
+        'website', validators=[DataRequired(), URL(), Length(max=200)]
     )
 
 
@@ -147,24 +147,24 @@ class ArtistForm(Form):
 
     )
     phone = StringField(
-        'phone', validators=[DataRequired()]
+        'phone', validators=[DataRequired(), Length(max=120)]
     )
     image_link = StringField(
-        'image_link', validators=[DataRequired(), URL(), Length(max=200)]
+        'image_link', validators=[DataRequired(), URL(), Length(max=500)]
     )
     genres = SelectMultipleField(
         'genres', validators=[DataRequired()],
         choices=genres_choices
     )
     facebook_link = StringField(
-        'facebook_link', validators=[DataRequired(), URL()]
+        'facebook_link', validators=[DataRequired(), URL(), Length(max=120)]
     )
     seeking_venue = BooleanField(
         'seeking_venue'
     )
     seeking_description = StringField(
-        'seeking_description', validators=[Length(max=500)]
+        'seeking_description', validators=[Length(max=200)]
     )
     website = StringField(
-        'website', validators=[DataRequired(), URL(), Length(max=120)]
+        'website', validators=[DataRequired(), URL(), Length(max=200)]
     )

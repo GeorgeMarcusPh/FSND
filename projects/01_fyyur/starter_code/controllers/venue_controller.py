@@ -6,7 +6,6 @@ from flask import render_template, request, Response, flash, redirect, url_for
 from flask_wtf import Form
 from forms import *
 from db_data_models import *
-from datetime import datetime
 
 #----------------------------------------------------------------------------#
 #  Venues
@@ -61,46 +60,34 @@ def show_venue(venue_id):
     past_shows = selected_venue.venues_show.filter(
         Show.start_time < datetime.now()).all()
 
-    data = {
-        "id": selected_venue.id,
-        "name": selected_venue.name,
-        "genres": selected_venue.genres,
-        "address": selected_venue.address,
-        "city": selected_venue.city,
-        "state": selected_venue.state,
-        "phone": selected_venue.phone,
-        "website": selected_venue.website,
-        "facebook_link": selected_venue.facebook_link,
-        "seeking_talent": selected_venue.seeking_talent,
-        "seeking_description": selected_venue.seeking_description,
-        "image_link": selected_venue.image_link,
-        "upcoming_shows": upcoming_shows,
-        "upcoming_shows_count": len(upcoming_shows),
-        "past_shows": past_shows,
-        "past_shows_count": len(past_shows),
+    data = selected_venue.map_venue_to_dict()
 
-    }
+    data["upcoming_shows"] = upcoming_shows
+    data["upcoming_shows_count"] = len(upcoming_shows)
+    data["past_shows"] = past_shows
+    data["past_shows_count"] = len(past_shows)
+
     return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
 #  ----------------------------------------------------------------
 
 
-@app.route('/venues/create', methods=['GET'])
+@ app.route('/venues/create', methods=['GET'])
 def create_venue_form():
     form = VenueForm()
     return render_template('forms/new_venue.html', form=form)
 
 
-@app.route('/venues/create', methods=['POST'])
+@ app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
-    form = VenueForm()
+    form = VenueForm(request.form)
     try:
         seeking_talent = False
         seeking_description = ''
-        if 'seeking_talent' in request.form:
-            seeking_talent = form.seeking_talent.data == 'y'
-        if 'seeking_description' in request.form:
+        if 'seeking_talent' in form:
+            seeking_talent = form.seeking_talent.data
+        if 'seeking_description' in form:
             seeking_description = form.seeking_description.data
 
         venue = Venue(
@@ -145,20 +132,7 @@ def edit_venue(venue_id):
     form.seeking_talent.data = selected_venue.seeking_talent
     form.seeking_description.data = selected_venue.seeking_description
 
-    venue = {
-        "id": selected_venue.id,
-        "name": selected_venue.name,
-        "address": selected_venue.address,
-        "genres": selected_venue.genres,
-        "city": selected_venue.city,
-        "state": selected_venue.state,
-        "phone": selected_venue.phone,
-        "website": selected_venue.website,
-        "facebook_link": selected_venue.facebook_link,
-        "seeking_venue": selected_venue.seeking_talent,
-        "seeking_description": selected_venue.seeking_description,
-        "image_link": selected_venue.image_link,
-    }
+    venue = selected_venue.map_venue_to_dict()
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
@@ -172,7 +146,7 @@ def edit_venue_submission(venue_id):
         seeking_talent = False
         seeking_description = ''
         if 'seeking_talent' in request.form:
-            seeking_talent = form.seeking_talent.data == 'y'
+            seeking_talent = form.seeking_talent.data
         if 'seeking_description' in request.form:
             seeking_description = form.seeking_description.data
 

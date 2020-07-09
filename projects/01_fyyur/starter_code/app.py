@@ -8,7 +8,8 @@ from logging import Formatter, FileHandler
 from controllers.venue_controller import *
 from controllers.artist_controller import *
 from controllers.show_controller import *
-
+from db_data_models import *
+from sqlalchemy import desc
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
@@ -36,7 +37,13 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 @app.route('/')
 def index():
-    return render_template('pages/home.html')
+    venues = Venue.query.order_by(desc(Venue.id)).limit(10).all()
+    artists = Artist.query.order_by(desc(Artist.id)).limit(10).all()
+    data = {
+        "venues": venues,
+        "artists": artists
+    }
+    return render_template('pages/home.html', data=data)
 
 
 #----------------------------------------------------------------------------#
