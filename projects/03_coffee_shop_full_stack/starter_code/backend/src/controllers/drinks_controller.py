@@ -75,7 +75,7 @@ def drinks_controller(app):
             recipe = request_body.get('recipe', None)
 
             drink.title = title
-            drink.recipe = recipe
+            drink.recipe = json.dumps(recipe)
             drink.update()
 
         except:

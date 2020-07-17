@@ -57,7 +57,6 @@ class Drink(db.Model):
     '''
 
     def short(self):
-        print(json.loads(self.recipe))
         short_recipe = [{'color': r['color'], 'parts': r['parts']}
                         for r in json.loads(self.recipe)]
         return {
@@ -125,7 +124,7 @@ class Drink(db.Model):
             drink.rollback()
     '''
 
-    def update(self):
+    def rollback(self):
         db.session.rollback()
 
     def __repr__(self):
